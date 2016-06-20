@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bet Scraping</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.0.0.min.js"   integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0="   crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.13.1/lodash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.js"></script>
+<style>
+
+    #matches{
+        text-align: center;
+        
+    }
+    table{
+        margin-left: auto;
+        margin-right: auto;
+        background-color: #e9e9ff;
+    }
+    td{
+        padding: 3px;
+
+    }
+    .container{
+            background-color: antiquewhite;
+    }
+    @media (max-width: 425px) {
+        .container{
+                padding:0 5px;
+        }
+    }
+</style>
+
+
+</head>
+<body>
+    <div class="container">
+        <div id="matches" class="row">
+        
+        </div>
+    </div>
+<script>
+(function (){
+    $(function () {
+        var action = window.location.search.toLowerCase().indexOf("ezy") > -1
+            ? "ezy"
+            : "moeg";
+        var url = "http://localhost:49434/api/" + action;
+        $.get(url, function (data){
+            _.forEach(data, function (match){
+                console.log(match);
+                var matchContainer = $("<div class='match col-xs-12'\>");
+                var start = moment(match.MatchStart);
+                
+                matchContainer.append("<h3>" + match.HomeTeam + " - " + match.AwayTeam + "</h3")
+                matchContainer.append("<h4>" + start.format("YYYY-MM-DD HH:mm") + "</h4>")
+
+                var tbody = $("<tbody\>");
+                
+                _.forEach(match.BettingResults, function (bet, i){
+                    var tr = $("<tr\>");
+                    tr.append("<td>"+ ++i +"&nbsp;</td>");
+                    tr.append("<td>"+ bet.Name +"&nbsp;</td>");
+                    tr.append("<td>"+ bet.Points +"&nbsp;</td>");
+                    tr.append("<td>"+ bet.Bet +"&nbsp;</td>");
+                    // + bet.Name + " - " + bet.Points + "p : " + bet.Bet +"</ul>");
+                    tbody.append(tr);
+                    
+                })
+                var tableHead = $("<thead\>").append($("<tr\>").append("<td>Placering</td><td>Namn</td><td>Poäng</td><td>Tip</td>"));
+                var table = $("<table\>").append(tableHead).append(tbody);
+                
+                matchContainer.append(table)
+                matchContainer.append("</div>")
+                
+                $("#matches").append(matchContainer)
+
+            })
+        });  
+    });
+})();
+    
+</script>
+</body>
+</html>
